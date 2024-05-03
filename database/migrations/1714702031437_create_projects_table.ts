@@ -1,19 +1,19 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
 export default class extends BaseSchema {
-  protected tableName = 'users'
+  protected tableName = 'projects'
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().notNullable()
-      table.string('name', 255).notNullable()
-      table.string('email', 255).notNullable().unique()
-      table.string('username', 255).notNullable().unique()
-      table.string('password').notNullable()
+      table.uuid('license_id').references('id').inTable('licenses').onDelete('CASCADE')
+      table.string('title', 200).notNullable()
+      table.enum('type_project', ['version', 'brance'])
+      table.text('description').nullable()
 
       table.timestamp('created_at').notNullable()
-      table.timestamp('updated_at').nullable()
-      table.timestamp('deleted_at').nullable()
+      table.timestamp('updated_at')
+      table.timestamp('deleted_at')
     })
   }
 
