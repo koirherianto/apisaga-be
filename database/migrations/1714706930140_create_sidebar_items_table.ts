@@ -18,8 +18,8 @@ export default class extends BaseSchema {
         .inTable('sidebar_separators')
         .onDelete('CASCADE')
         .nullable()
+      table.string('name', 100).notNullable()
       table.tinyint('order').notNullable()
-
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at')
       table.timestamp('deleted_at')
