@@ -6,8 +6,13 @@ export default class extends BaseSchema {
   async up() {
     // pivot table
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('user_id').references('id').inTable('users').onDelete('CASCADE')
-      table.uuid('project_id').references('id').inTable('projects').onDelete('CASCADE')
+      table.uuid('user_id').references('id').inTable('users').onDelete('CASCADE').notNullable()
+      table
+        .uuid('project_id')
+        .references('id')
+        .inTable('projects')
+        .onDelete('CASCADE')
+        .notNullable()
     })
   }
 

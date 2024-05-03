@@ -6,7 +6,7 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().notNullable()
-      table.uuid('license_id').references('id').inTable('licenses').onDelete('CASCADE')
+      table.uuid('license_id').references('id').inTable('licenses').onDelete('CASCADE').nullable()
       table.string('title', 200).notNullable()
       table.enum('type', ['version', 'brance']).notNullable()
       table.enum('visibility', ['public', 'private']).notNullable()
