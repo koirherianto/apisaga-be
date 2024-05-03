@@ -8,7 +8,8 @@ export default class extends BaseSchema {
       table.uuid('id').primary().notNullable()
       table.uuid('license_id').references('id').inTable('licenses').onDelete('CASCADE')
       table.string('title', 200).notNullable()
-      table.enum('type_project', ['version', 'brance'])
+      table.enum('type', ['version', 'brance']).notNullable()
+      table.enum('visibility', ['public', 'private']).notNullable()
       table.text('description').nullable()
 
       table.timestamp('created_at').notNullable()
