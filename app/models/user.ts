@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, column, manyToMany, beforeCreate, beforeSave } from '@adonisjs/lucid/orm'
+import { BaseModel, column, manyToMany, beforeCreate } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
 import type { ManyToMany } from '@adonisjs/lucid/types/relations'
@@ -13,7 +13,9 @@ const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
 })
 
 export default class User extends compose(BaseModel, AuthFinder) {
-  static accessTokens = DbAccessTokensProvider.forModel(User)
+  static accessTokens = DbAccessTokensProvider.forModel(User, {
+    expiresIn: '30 days',
+  })
 
   // id pakai uuid
   @column({ isPrimary: true })
@@ -40,13 +42,6 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @beforeCreate()
   static assignUuid(user: User) {
     user.id = crypto.randomUUID()
-  }
-
-  @beforeSave()
-  static async hashPassword(user: User) {
-    if (user.$dirty.password) {
-      user.password = await hash.make(user.password)
-    }
   }
 
   // relasi many to many ke project
