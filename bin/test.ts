@@ -15,7 +15,9 @@ process.env.NODE_ENV = 'test'
 import 'reflect-metadata'
 import { Ignitor, prettyPrintError } from '@adonisjs/core'
 import { configure, processCLIArgs, run } from '@japa/runner'
-
+import { expect } from '@japa/expect'
+import { expectTypeOf } from '@japa/expect-type'
+import { apiClient } from '@japa/api-client'
 /**
  * URL to the application root. AdonisJS need it to resolve
  * paths to file and directories for scaffolding commands
@@ -53,6 +55,7 @@ new Ignitor(APP_ROOT, { importer: IMPORTER })
         setup: runnerHooks.setup,
         teardown: runnerHooks.teardown.concat([() => app.terminate()]),
       },
+      plugins: [expect(), expectTypeOf(), apiClient('http://localhost:3333')],
     })
   })
   .run(() => run())

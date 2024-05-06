@@ -5,14 +5,24 @@ import hash from '@adonisjs/core/services/hash'
 
 export default class AuthController {
   async register({ request, response }: HttpContext) {
+    console.log('register dijalankan')
+
     const validate = await request.validateUsing(registerValidator)
 
     const isEmailExist = await User.findBy('email', validate.email)
+    const isUsernameExist = await User.findBy('username', validate.username)
 
     if (isEmailExist) {
       return response.badRequest({
         success: false,
-        message: 'Email already exist',
+        message: 'Email already registered',
+      })
+    }
+
+    if (isUsernameExist) {
+      return response.badRequest({
+        success: false,
+        message: 'Username already registered',
       })
     }
 
