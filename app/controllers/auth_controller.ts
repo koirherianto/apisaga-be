@@ -50,9 +50,9 @@ export default class AuthController {
     const user = await User.findBy('email', email)
 
     if (!user || user === null) {
-      return response.status(400).json({
+      return response.status(401).json({
         success: false,
-        message: 'Invalid email or passwordd',
+        message: 'Invalid email or password',
       })
     }
 
@@ -100,8 +100,8 @@ export default class AuthController {
 
     return response.ok({
       success: true,
-      message: 'User logged out',
-      data: getUser,
+      userId: user.id,
+      message: 'Logout successfully',
     })
   }
 }

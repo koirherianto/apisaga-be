@@ -13,6 +13,10 @@ const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
 })
 
 export default class User extends compose(BaseModel, AuthFinder) {
+  token: any
+  static createAccessToken(user: User) {
+    throw new Error('Method not implemented.')
+  }
   static accessTokens = DbAccessTokensProvider.forModel(User, {
     expiresIn: '30 days',
   })

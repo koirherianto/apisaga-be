@@ -1,7 +1,7 @@
-import { removeTestUser } from '#tests/util'
+import { TestUserResult, createTestUser, removeTestUser } from '#tests/util'
 import { test } from '@japa/runner'
 
-test.group('Register API', (group) => {
+test.group('Register API | POST | api/register', (group) => {
   group.setup(() => {
     console.log('executed before all the test')
   })
@@ -76,20 +76,128 @@ test.group('Register API', (group) => {
     expect(errors[0]['field']).toBe('name')
 
     expect(errors).toBeDefined()
-    // expect(errors[1]).toBe({
-    //   message: 'The email field must be defined',
-    //   rule: 'required',
-    //   field: 'email',
-    // })
-    // expect(errors[2]).toBe({
-    //   message: 'The username field must be defined',
-    //   rule: 'required',
-    //   field: 'username',
-    // })
-    // expect(errors[3]).toBe({
-    //   message: 'The password field must be defined',
-    //   rule: 'required',
-    //   field: 'password',
-    // })
+  })
+})
+
+test.group('Login API | POST | /api/register', (group) => {
+  group.setup(async () => {
+    await createTestUser()
+  })
+
+  group.teardown(async () => {
+    await removeTestUser()
+  })
+
+  test('Login account', async ({ client, expect }) => {
+    const response = await client.post('/api/login').json({
+      email: 'test@test.com',
+      password: '123456',
+    })
+
+    expect(response.status()).toBe(200)
+    expect(response.body().success).toBeTruthy()
+    expect(response.body().data.id).toBeDefined()
+    expect(response.body().data.name).toBe('test')
+    expect(response.body().data.email).toBe('test@test.com')
+    expect(response.body().data.username).toBe('test')
+    expect(response.body().token).toHaveProperty('token')
+    expect(response.body().message).toBe('Login successfully')
+    expect(response.body().message).toBe('Login successfully')
+  })
+
+  test('should reject if email or password is invalid', async ({ client, expect }) => {
+    const response = await client.post('/api/login').json({
+      email: '',
+      password: '',
+    })
+
+    expect(response.status()).toBe(422)
+    expect(response.body().errors).toBeDefined()
+  })
+
+  // should reject login if password is wrong
+  test('should reject if password is wrong', async ({ client, expect }) => {
+    const response = await client.post('/api/login').json({
+      email: 'test@test.com',
+      password: 'salah',
+    })
+
+    console.log(response.body())
+
+    expect(response.status()).toBe(401)
+    expect(response.body().success).toBeFalsy()
+    expect(response.body().message).toBe('Invalid email or password')
+  })
+  test('should reject if email is wrong', async ({ client, expect }) => {
+    const response = await client.post('/api/login').json({
+      email: 'salah@test.com',
+      password: '123456',
+    })
+
+    expect(response.status()).toBe(401)
+    expect(response.body().success).toBeFalsy()
+    expect(response.body().message).toBe('Invalid email or password')
+  })
+})
+
+test.group('Me API | GET | /api/me', (group) => {
+  let testUser: TestUserResult | null = null
+  group.setup(async () => {
+    testUser = await createTestUser()
+  })
+
+  group.teardown(async () => {
+    await removeTestUser()
+  })
+
+  test('Get user data', async ({ client, expect }) => {
+    const response = await client.get('/api/me').bearerToken(testUser!.token)
+
+    const body = response.body()
+
+    expect(response.status()).toBe(200)
+    expect(body.success).toBeTruthy()
+    expect(body.data.id).toBe(testUser!.user.id)
+    expect(body.data.name).toBe('test')
+    expect(body.data.email).toBe('test@test.com')
+    expect(body.data.username).toBe('test')
+    expect(body.message).toBe('User data')
+  })
+
+  test('should reject if token is invalid', async ({ client, expect }) => {
+    const response = await client.get('/api/me').bearerToken('salah token')
+
+    console.log(response.body())
+    expect(response.status()).toBe(401)
+    expect(response.body().errors).toBeDefined()
+  })
+})
+
+test.group('Logout API | DELETE | /api/logout', (group) => {
+  let testUser: TestUserResult | null = null
+  group.setup(async () => {
+    testUser = await createTestUser()
+  })
+
+  group.teardown(async () => {
+    await removeTestUser()
+  })
+
+  test('Logout user', async ({ client, expect }) => {
+    const response = await client.delete('/api/logout').bearerToken(testUser!.token)
+
+    const body = response.body()
+
+    expect(response.status()).toBe(200)
+    expect(body.success).toBeTruthy()
+    expect(body.message).toBe('Logout successfully')
+    expect(body.userId).toBeDefined()
+  })
+
+  test('should reject if token is invalid', async ({ client, expect }) => {
+    const response = await client.delete('/api/logout').bearerToken('salah token')
+
+    expect(response.status()).toBe(401)
+    expect(response.body().errors).toBeDefined()
   })
 })
