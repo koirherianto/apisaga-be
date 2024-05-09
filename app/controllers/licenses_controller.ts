@@ -1,4 +1,5 @@
 import License from '#models/license'
+import { createLicenseValidator, licenseIdValidator, updateLicenseValidator } from '#validators/license'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class LicensesController {
@@ -12,7 +13,8 @@ export default class LicensesController {
         })
     }
 
-    async show({ response, params }: HttpContext) {
+    async show({response, params  }: HttpContext) {
+        await licenseIdValidator.validate(params.id)
         const license = await License.find(params.id)
 
         if (!license) {
@@ -30,9 +32,8 @@ export default class LicensesController {
     }
 
     async store({ request, response }: HttpContext) {
-        // validate request
-        const { name } = request.only(['name'])
-        const license = await License.create({ name })
+        const validate = await request.validateUsing(createLicenseValidator)
+        const license = await License.create({ name : validate.name })
         return response.status(201).json({
             success: true,
             license: license,
@@ -41,18 +42,14 @@ export default class LicensesController {
     }
 
     async update({ request, response, params }: HttpContext) {
-        // validate request
-        const { name } = request.only(['name'])
-        const license = await License.find(params.id)
+        const id = await licenseIdValidator.validate(params.id)
+        const validate = await request.validateUsing(updateLicenseValidator,{
+            meta: { id: params.id }
+        })
+        
+        const license = await License.findOrFail(id)
 
-        if (!license) {
-            return response.status(404).json({
-                success: false,
-                message: 'License not found',
-            })
-        }
-
-        license.name = name
+        license.name = validate.name
         await license.save()
 
         return response.status(200).json({
@@ -63,17 +60,9 @@ export default class LicensesController {
     }
 
     async destroy({ response, params }: HttpContext) {
-        // validator
+        const id = await licenseIdValidator.validate(params.id)
 
-        const license = await License.find(params.id)
-
-        if (!license) {
-            return response.status(404).json({
-                success: false,
-                message: 'License not found',
-            })
-        }
-
+        const license = await License.findOrFail(id)
         await license.delete()
 
         return response.status(200).json({
