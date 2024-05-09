@@ -1,4 +1,5 @@
 import vine from '@vinejs/vine'
+import { uniqueCustom } from './costume/uniq.js'
 
 // uuid validator
 export const licenseIdValidator = vine.compile(
@@ -13,26 +14,15 @@ export const licenseIdValidator = vine.compile(
 
 export const createLicenseValidator = vine.compile(
     vine.object({
-        name: vine.string().trim().unique(async (db, value) => {
-            const user = await db
-              .from('licenses')
-              .where('name', value)
-              .first()
-            return !user
-          })
+        name: vine.string().trim().use(uniqueCustom({table: 'licenses', column: 'name'}))
     })
 )
 
-export const updateLicenseValidator = vine.
-    withMetaData<{ id: string }>().compile(
-    vine.object({
-        name: vine.string().trim().unique(async (db, value, field) => {
-            const user = await db
-              .from('licenses')
-              .whereNot('id', field.meta.id)
-              .where('name', value)
-              .first()
-            return !user
-          })
-    })
-)
+export function updateLicenseValidator(id : string) { // Capture id as a parameter
+  return vine
+    .compile(
+      vine.object({
+        name: vine.string().trim().use(uniqueCustom({ table: 'licenses', column: 'name', except: id }))
+      })
+    );
+}

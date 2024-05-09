@@ -8,6 +8,7 @@ import { FieldContext } from '@vinejs/vine/types'
 type Options = {
   table: string
   column: string
+  except?: string
 }
 
 /**
@@ -22,17 +23,21 @@ async function unique(value: unknown, options: Options, field: FieldContext) {
   if (typeof value !== 'string') {
     return
   }
-
-  const row = await db
-    .query()
-    .select(options.column)
-    .from(options.table)
-    .where(options.column, value)
-    .first()
+  let row
+  if (options.except) {
+    row = await db
+      .from(options.table)
+      .select(options.column)
+      .where(options.column, value)
+      .whereNot('id', options.except)
+      .first()
+  } else {
+    row = await db.from(options.table).select(options.column).where(options.column, value).first()
+  }
 
   if (row) {
     field.report('The {{ field }} field is not unique', 'unique', field)
   }
 }
 
-export const uniqueRule = vine.createRule(unique)
+export const uniqueCustom = vine.createRule(unique)

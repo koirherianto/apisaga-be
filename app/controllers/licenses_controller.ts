@@ -43,9 +43,7 @@ export default class LicensesController {
 
     async update({ request, response, params }: HttpContext) {
         const id = await licenseIdValidator.validate(params.id)
-        const validate = await request.validateUsing(updateLicenseValidator,{
-            meta: { id: params.id }
-        })
+        const validate = await request.validateUsing(updateLicenseValidator(id))
         
         const license = await License.findOrFail(id)
 
