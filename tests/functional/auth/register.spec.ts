@@ -2,12 +2,7 @@ import { removeTestUser } from '#tests/util'
 import { test } from '@japa/runner'
 
 test.group('Register API | POST | api/register', (group) => {
-  group.setup(() => {
-    console.log('executed before all the test')
-  })
-
   group.teardown(async () => {
-    console.log('executed after all the test')
     await removeTestUser()
   })
 
