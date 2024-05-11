@@ -65,7 +65,9 @@ export default class LicensesController {
 
         return response.status(200).json({
             success: true,
-            licenseId : license.id,
+            data: {
+                licenseId : license.id,
+            },
             message: `License deleted successfully`,
         })
     }
