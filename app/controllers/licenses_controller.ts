@@ -36,7 +36,7 @@ export default class LicensesController {
         const license = await License.create({ name : validate.name })
         return response.status(201).json({
             success: true,
-            license: license,
+            data: license,
             message: 'License created successfully',
         })
     }

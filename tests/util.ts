@@ -1,3 +1,4 @@
+import License from '#models/license'
 import User from '#models/user'
 
 export interface TestUserResult {
@@ -25,4 +26,16 @@ export const createTestUser = async (): Promise<TestUserResult> => {
     user: user,
     token: token.value!.release(),
   }
+}
+
+export const createTestLicense = async (): Promise<License> => {
+  return await License.create({
+    name: 'test license',
+  })
+}
+
+export const removeTestLicense = async () => {
+  const license = await License.findByOrFail('name', 'test license')
+
+  license.delete()
 }
