@@ -3,6 +3,7 @@
 import { middleware } from '#start/kernel'
 const AuthController = () => import('#controllers/auth_controller')
 const LicensesController = () => import('#controllers/licenses_controller')
+const ProjectsController = () => import('#controllers/projects_controller')
 import router from '@adonisjs/core/services/router'
 
 router.get('/', async () => {
@@ -17,7 +18,7 @@ router.group(() => {
     router.get('/me', [AuthController, 'me'])
     router.delete('/logout', [AuthController, 'logout'])
 
-    // router.post('/license', [LicensesController, 'store'])
     router.resource('/licenses', LicensesController)
+    router.resource('/projects', ProjectsController)
   }).use(middleware.auth())
 }).prefix('api')

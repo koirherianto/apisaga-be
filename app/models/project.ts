@@ -11,6 +11,7 @@ import type { BelongsTo, HasMany, ManyToMany } from '@adonisjs/lucid/types/relat
 import License from '#models/license'
 import Version from '#models/version'
 import User from './user.js'
+import string from '@adonisjs/core/helpers/string'
 export default class Project extends BaseModel {
   @column({ isPrimary: true })
   declare id: string
@@ -20,6 +21,9 @@ export default class Project extends BaseModel {
 
   @column()
   declare title: string
+
+  @column()
+  declare slug: string
 
   @column()
   declare type: string
@@ -39,16 +43,22 @@ export default class Project extends BaseModel {
   @beforeCreate()
   static assignUuid(project: Project) {
     project.id = crypto.randomUUID()
+
+    if (!project.slug) {
+      project.slug = string.slug(project.title)
+    }
   }
 
   @belongsTo(() => License, {
-    foreignKey: 'license_id',
+    foreignKey: 'licenseId',
   })
   declare license: BelongsTo<typeof License>
 
   @hasMany(() => Version)
   declare versions: HasMany<typeof Version>
 
-  @manyToMany(() => User)
+  @manyToMany(() => User, {
+    pivotTimestamps: true,
+  })
   declare users: ManyToMany<typeof User>
 }

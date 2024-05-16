@@ -14,9 +14,6 @@ const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
 
 export default class User extends compose(BaseModel, AuthFinder) {
   token: any
-  static createAccessToken(user: User) {
-    throw new Error('Method not implemented.')
-  }
   static accessTokens = DbAccessTokensProvider.forModel(User, {
     expiresIn: '30 days',
   })
@@ -50,16 +47,16 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   // relasi many to many ke project
   @manyToMany(() => Project, {
-    localKey: 'id', // nama kolom primary key di table ini
-    pivotForeignKey: 'user_id', // nama kolom foreign key di pivot table
-    relatedKey: 'id', // nama kolom primary key di table target
-    pivotRelatedForeignKey: 'project_id', // nama kolom foreign key di pivot table
+    // localKey: 'id', // nama kolom primary key di table ini
+    // pivotForeignKey: 'user_id', // nama kolom foreign key di pivot table
+    // relatedKey: 'id', // nama kolom primary key di table target
+    // pivotRelatedForeignKey: 'project_id', // nama kolom foreign key di pivot table
     pivotTable: 'project_user', // nama pivot table
-    pivotColumns: [], // jika tabel pivot memiliki kolom tambahan
+    // pivotColumns: [], // jika tabel pivot memiliki kolom tambahan
     pivotTimestamps: {
       // jika tabel pivot memiliki kolom timestamps
       createdAt: 'created_at',
-      updatedAt: false,
+      updatedAt: true,
     },
   })
   declare projects: ManyToMany<typeof Project>
