@@ -1,3 +1,8 @@
+import {
+  createProjectValidator,
+  projectIdValidator,
+  updateProjectValidator,
+} from '#validators/project'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class ProjectsController {
@@ -12,7 +17,7 @@ export default class ProjectsController {
   }
 
   async store({ auth, request, response }: HttpContext) {
-    const data = request.only(['licenseId', 'title', 'type', 'visibility', 'description'])
+    const data = await request.validateUsing(createProjectValidator)
     const project = await auth.user!.related('projects').create(data)
 
     return response.created({
@@ -23,7 +28,8 @@ export default class ProjectsController {
   }
 
   async show({ auth, response, params }: HttpContext) {
-    const project = await auth.user!.related('projects').query().where('id', params.id).first()
+    const id = await projectIdValidator.validate(params.id)
+    const project = await auth.user!.related('projects').query().where('id', id).first()
     return response.status(200).json({
       success: true,
       data: project,
@@ -32,8 +38,10 @@ export default class ProjectsController {
   }
 
   async update({ auth, request, response, params }: HttpContext) {
-    const data = request.only(['licenseId', 'title', 'type', 'visibility', 'description'])
-    const project = await auth.user!.related('projects').query().where('id', params.id).first()
+    const id = await projectIdValidator.validate(params.id)
+    const data = await request.validateUsing(updateProjectValidator)
+    const project = await auth.user!.related('projects').query().where('id', id).first()
+
     project?.merge(data)
     await project?.save()
 
@@ -45,7 +53,8 @@ export default class ProjectsController {
   }
 
   async destroy({ auth, response, params }: HttpContext) {
-    const project = await auth.user!.related('projects').query().where('id', params.id).first()
+    const id = await projectIdValidator.validate(params.id)
+    const project = await auth.user!.related('projects').query().where('id', id).first()
     await project?.delete()
 
     return response.status(200).json({
