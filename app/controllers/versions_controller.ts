@@ -2,19 +2,13 @@ import { createVersionValidator, updateVersionValidator } from '#validators/vers
 import { Authenticator } from '@adonisjs/auth'
 import { Authenticators } from '@adonisjs/auth/types'
 import type { HttpContext } from '@adonisjs/core/http'
+import ResponseError from '#exceptions/respon_error_exception'
+import Project from '#models/project'
 
 export default class VersionsController {
   // /project/:slug/version
   async index({ auth, params, response }: HttpContext) {
-    const project = await this.projectCheck(auth, params.slug)
-
-    if (!project) {
-      return response.status(404).json({
-        success: false,
-        messages: 'Data not found',
-      })
-    }
-
+    const project = await this.checkProjectMustExist(auth, params.slug)
     const versions = await project!.related('versions').query()
 
     return response.ok({
@@ -26,15 +20,7 @@ export default class VersionsController {
 
   // /projects/:slug/version/:version
   async show({ auth, params, response }: HttpContext) {
-    const project = await this.projectCheck(auth, params.slug)
-
-    if (!project) {
-      return response.status(404).json({
-        success: false,
-        messages: 'Data not found',
-      })
-    }
-
+    const project = await this.checkProjectMustExist(auth, params.slug)
     const version = await project!.related('versions').query().where('name', params.version).first()
 
     return response.ok({
@@ -47,15 +33,7 @@ export default class VersionsController {
   // /projects/:slug/version
   async store({ auth, request, params, response }: HttpContext) {
     const validate = await request.validateUsing(createVersionValidator)
-    const project = await this.projectCheck(auth, params.slug)
-
-    if (!project) {
-      return response.status(404).json({
-        success: false,
-        messages: 'Data not found',
-      })
-    }
-
+    const project = await this.checkProjectMustExist(auth, params.slug)
     const isSame = await project.related('versions').query().where('name', validate.name).first()
 
     if (isSame) {
@@ -79,14 +57,7 @@ export default class VersionsController {
   // /projects/:slug/version/:version
   async update({ auth, request, params, response }: HttpContext) {
     const validate = await request.validateUsing(updateVersionValidator)
-    const project = await this.projectCheck(auth, params.slug)
-
-    if (!project) {
-      return response.status(404).json({
-        success: false,
-        messages: 'Data not found',
-      })
-    }
+    const project = await this.checkProjectMustExist(auth, params.slug)
 
     const version = await project!.related('versions').query().where('name', params.version).first()
 
@@ -120,15 +91,7 @@ export default class VersionsController {
 
   // /projects/:slug/version/:version
   async destroy({ auth, params, response }: HttpContext) {
-    const project = await this.projectCheck(auth, params.slug)
-
-    if (!project) {
-      return response.status(404).json({
-        success: false,
-        messages: 'Data not found',
-      })
-    }
-
+    const project = await this.checkProjectMustExist(auth, params.slug)
     const version = await project!.related('versions').query().where('name', params.version).first()
 
     if (!version) {
@@ -147,8 +110,12 @@ export default class VersionsController {
     })
   }
 
-  async projectCheck(auth: Authenticator<Authenticators>, slug: string) {
+  async checkProjectMustExist(auth: Authenticator<Authenticators>, slug: string): Promise<Project> {
     const project = await auth.user!.related('projects').query().where('slug', slug).first()
+
+    if (!project) {
+      throw new ResponseError('Projects not found', { status: 404 })
+    }
 
     return project
   }
