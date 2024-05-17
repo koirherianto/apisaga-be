@@ -1,6 +1,5 @@
 import {
   createProjectValidator,
-  projectIdValidator,
   projectSlugValidator,
   updateProjectValidator,
 } from '#validators/project'

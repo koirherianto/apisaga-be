@@ -16,9 +16,6 @@ export default class Version extends BaseModel {
   declare name: string
 
   @column()
-  declare content: string | null
-
-  @column()
   declare isDefault: boolean
 
   @column()
