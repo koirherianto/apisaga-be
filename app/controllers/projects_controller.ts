@@ -1,6 +1,7 @@
 import {
   createProjectValidator,
   projectIdValidator,
+  projectSlugValidator,
   updateProjectValidator,
 } from '#validators/project'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -28,8 +29,9 @@ export default class ProjectsController {
   }
 
   async show({ auth, response, params }: HttpContext) {
-    const id = await projectIdValidator.validate(params.id)
-    const project = await auth.user!.related('projects').query().where('id', id).first()
+    const slug = await projectSlugValidator.validate(params.id)
+    const project = await auth.user!.related('projects').query().where('slug', slug).first()
+
     return response.status(200).json({
       success: true,
       data: project,
@@ -38,9 +40,9 @@ export default class ProjectsController {
   }
 
   async update({ auth, request, response, params }: HttpContext) {
-    const id = await projectIdValidator.validate(params.id)
+    const slug = await projectSlugValidator.validate(params.id)
     const data = await request.validateUsing(updateProjectValidator)
-    const project = await auth.user!.related('projects').query().where('id', id).first()
+    const project = await auth.user!.related('projects').query().where('slug', slug).first()
 
     project?.merge(data)
     await project?.save()
@@ -53,8 +55,8 @@ export default class ProjectsController {
   }
 
   async destroy({ auth, response, params }: HttpContext) {
-    const id = await projectIdValidator.validate(params.id)
-    const project = await auth.user!.related('projects').query().where('id', id).first()
+    const slug = await projectSlugValidator.validate(params.id)
+    const project = await auth.user!.related('projects').query().where('slug', slug).first()
     await project?.delete()
 
     return response.status(200).json({

@@ -10,6 +10,13 @@ export const projectIdValidator = vine.compile(
     })
 )
 
+export const projectSlugValidator = vine.compile(
+  vine.string().exists(async (db, value) => {
+    const row = await db.from('projects').where('slug', value).first()
+    return row
+  })
+)
+
 export const createProjectValidator = vine.compile(
   vine.object({
     licenseId: vine.string().trim().uuid().optional(),
