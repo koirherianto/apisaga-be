@@ -1,10 +1,12 @@
 import { createVersionValidator, updateVersionValidator } from '#validators/version'
+import { Authenticator } from '@adonisjs/auth'
+import { Authenticators } from '@adonisjs/auth/types'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class VersionsController {
   // /project/:slug/version
   async index({ auth, params, response }: HttpContext) {
-    const project = await auth.user!.related('projects').query().where('slug', params.slug).first()
+    const project = await this.projectCheck(auth, params.slug)
 
     if (!project) {
       return response.status(404).json({
@@ -24,7 +26,7 @@ export default class VersionsController {
 
   // /projects/:slug/version/:version
   async show({ auth, params, response }: HttpContext) {
-    const project = await auth.user!.related('projects').query().where('slug', params.slug).first()
+    const project = await this.projectCheck(auth, params.slug)
 
     if (!project) {
       return response.status(404).json({
@@ -45,7 +47,7 @@ export default class VersionsController {
   // /projects/:slug/version
   async store({ auth, request, params, response }: HttpContext) {
     const validate = await request.validateUsing(createVersionValidator)
-    const project = await auth.user!.related('projects').query().where('slug', params.slug).first()
+    const project = await this.projectCheck(auth, params.slug)
 
     if (!project) {
       return response.status(404).json({
@@ -77,7 +79,7 @@ export default class VersionsController {
   // /projects/:slug/version/:version
   async update({ auth, request, params, response }: HttpContext) {
     const validate = await request.validateUsing(updateVersionValidator)
-    const project = await auth.user!.related('projects').query().where('slug', params.slug).first()
+    const project = await this.projectCheck(auth, params.slug)
 
     if (!project) {
       return response.status(404).json({
@@ -118,7 +120,7 @@ export default class VersionsController {
 
   // /projects/:slug/version/:version
   async destroy({ auth, params, response }: HttpContext) {
-    const project = await auth.user!.related('projects').query().where('slug', params.slug).first()
+    const project = await this.projectCheck(auth, params.slug)
 
     if (!project) {
       return response.status(404).json({
@@ -143,6 +145,12 @@ export default class VersionsController {
       data: version,
       messages: 'Data deleted successfully',
     })
+  }
+
+  async projectCheck(auth: Authenticator<Authenticators>, slug: string) {
+    const project = await auth.user!.related('projects').query().where('slug', slug).first()
+
+    return project
   }
 
   isSemanticVersion(version: string): boolean {
