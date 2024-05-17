@@ -1,3 +1,4 @@
+import { createVersionValidator, updateVersionValidator } from '#validators/version'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class VersionsController {
@@ -43,6 +44,7 @@ export default class VersionsController {
 
   // /projects/:slug/version
   async store({ auth, request, params, response }: HttpContext) {
+    const validate = await request.validateUsing(createVersionValidator)
     const project = await auth.user!.related('projects').query().where('slug', params.slug).first()
 
     if (!project) {
@@ -52,19 +54,18 @@ export default class VersionsController {
       })
     }
 
-    const data = request.only(['name', 'isDefault', 'versionStatus', 'visibility', 'projectId'])
-    data.projectId = project.id
+    const isSame = await project.related('versions').query().where('name', validate.name).first()
 
-    const hasSameName = await project.related('versions').query().where('name', data.name).first()
-
-    if (hasSameName) {
+    if (isSame) {
       return response.status(400).json({
         success: false,
         messages: 'Version name already exists',
       })
     }
 
-    const version = await project!.related('versions').create(data)
+    const version = await project!
+      .related('versions')
+      .create({ ...validate, projectId: project.id })
 
     return response.created({
       success: true,
@@ -75,6 +76,7 @@ export default class VersionsController {
 
   // /projects/:slug/version/:version
   async update({ auth, request, params, response }: HttpContext) {
+    const validate = await request.validateUsing(updateVersionValidator)
     const project = await auth.user!.related('projects').query().where('slug', params.slug).first()
 
     if (!project) {
@@ -93,12 +95,10 @@ export default class VersionsController {
       })
     }
 
-    const data = request.only(['name', 'isDefault', 'versionStatus', 'visibility'])
-
-    if (data.name) {
-      const hasSameName = await project.related('versions').query().where('name', data.name).first()
+    if (validate.name) {
+      const isSame = await project.related('versions').query().where('name', validate.name).first()
       // kecuai jika versi yang diupdate adalah versi yang sama
-      if (hasSameName && hasSameName.id !== version.id) {
+      if (isSame && isSame.id !== version.id) {
         return response.status(400).json({
           success: false,
           messages: 'Version name already exists',
@@ -106,7 +106,7 @@ export default class VersionsController {
       }
     }
 
-    version.merge(data)
+    version.merge(validate)
     await version.save()
 
     return response.status(200).json({

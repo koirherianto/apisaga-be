@@ -20,6 +20,9 @@ export default class SidebarItem extends BaseModel {
   @column()
   declare order: number
 
+  @column()
+  declare content: string
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
