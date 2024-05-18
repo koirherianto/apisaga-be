@@ -8,6 +8,7 @@ import Project from '#models/project'
 export default class VersionsController {
   // /project/:slug/version
   async index({ auth, params, response }: HttpContext) {
+    throw new ResponseError('Projects not found', { status: 400 })
     const project = await this.checkProjectMustExist(auth, params.slug)
     const versions = await project!.related('versions').query()
 

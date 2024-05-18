@@ -1,11 +1,7 @@
-import { removeTestUser } from '#tests/util'
+import { createTestUser, removeTestUser } from '#tests/util'
 import { test } from '@japa/runner'
 
-test.group('Register API | POST | api/register', (group) => {
-  group.teardown(async () => {
-    await removeTestUser()
-  })
-
+test.group('Register API | POST | api/register', () => {
   test('Create an account', async ({ client, expect }) => {
     const response = await client.post('/api/register').json({
       name: 'test',
@@ -21,9 +17,12 @@ test.group('Register API | POST | api/register', (group) => {
     expect(response.body().data.username).toBe('test')
     expect(response.body().token).toHaveProperty('token')
     expect(response.body().message).toBe('User created successfully')
+
+    await removeTestUser()
   })
 
   test('should reject if email already registered', async ({ client, expect }) => {
+    await createTestUser()
     const userData = {
       name: 'test',
       email: 'test@test.com',
@@ -36,9 +35,12 @@ test.group('Register API | POST | api/register', (group) => {
     expect(response.status()).toBe(400)
     expect(response.body().success).toBeFalsy()
     expect(response.body().message).toBe('Email already registered')
+
+    await removeTestUser()
   })
 
   test('should reject if username already registered', async ({ client, expect }) => {
+    await createTestUser()
     const userData = {
       name: 'test',
       email: 'test2@test.com',
@@ -51,6 +53,7 @@ test.group('Register API | POST | api/register', (group) => {
     expect(response.status()).toBe(400)
     expect(response.body().success).toBeFalsy()
     expect(response.body().message).toBe('Username already registered')
+    await removeTestUser()
   })
 
   test('should reject if request is invalid', async ({ client, expect }) => {

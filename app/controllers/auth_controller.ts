@@ -1,6 +1,7 @@
 import User from '#models/user'
 import { loginValidator, registerValidator } from '#validators/auth'
 import type { HttpContext } from '@adonisjs/core/http'
+import ResponseError from '#exceptions/respon_error_exception'
 import hash from '@adonisjs/core/services/hash'
 
 export default class AuthController {
@@ -11,17 +12,11 @@ export default class AuthController {
     const isUsernameExist = await User.findBy('username', validate.username)
 
     if (isEmailExist) {
-      return response.badRequest({
-        success: false,
-        message: 'Email already registered',
-      })
+      throw new ResponseError('Email already registered', { status: 400 })
     }
 
     if (isUsernameExist) {
-      return response.badRequest({
-        success: false,
-        message: 'Username already registered',
-      })
+      throw new ResponseError('Username already registered', { status: 400 })
     }
 
     const user = await User.create(validate)
@@ -36,10 +31,7 @@ export default class AuthController {
       })
     }
 
-    return response.badRequest({
-      success: false,
-      message: 'Email already exist',
-    })
+    throw new ResponseError('Email already registered', { status: 400 })
   }
 
   async login({ request, response }: HttpContext) {
