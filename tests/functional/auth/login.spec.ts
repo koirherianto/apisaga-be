@@ -2,11 +2,11 @@ import { createTestUser, removeTestUser } from '#tests/util'
 import { test } from '@japa/runner'
 
 test.group('Login API | POST | /api/register', (group) => {
-  group.setup(async () => {
+  group.each.setup(async () => {
     await createTestUser()
   })
 
-  group.teardown(async () => {
+  group.each.teardown(async () => {
     await removeTestUser()
   })
 
@@ -44,11 +44,9 @@ test.group('Login API | POST | /api/register', (group) => {
       password: 'salah',
     })
 
-    console.log(response.body())
-
     expect(response.status()).toBe(401)
     expect(response.body().success).toBeFalsy()
-    expect(response.body().message).toBe('Invalid email or password')
+    expect(response.body().message).toBe('Email or password is wrong')
   })
   test('should reject if email is wrong', async ({ client, expect }) => {
     const response = await client.post('/api/login').json({
@@ -58,6 +56,6 @@ test.group('Login API | POST | /api/register', (group) => {
 
     expect(response.status()).toBe(401)
     expect(response.body().success).toBeFalsy()
-    expect(response.body().message).toBe('Invalid email or password')
+    expect(response.body().message).toBe('Email or password is wrong')
   })
 })

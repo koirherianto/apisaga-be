@@ -40,10 +40,7 @@ export default class AuthController {
     const user = await User.findBy('email', email)
 
     if (!user || user === null) {
-      return response.status(401).json({
-        success: false,
-        message: 'Invalid email or password',
-      })
+      throw new ResponseError('Email or password is wrong', { status: 401 })
     }
 
     const isVerify = await hash.verify(user!.password, password)
@@ -59,10 +56,7 @@ export default class AuthController {
       })
     }
 
-    return response.status(401).json({
-      success: false,
-      message: 'Invalid email or password',
-    })
+    throw new ResponseError('Email or password is wrong', { status: 401 })
   }
 
   async me({ auth, response }: HttpContext) {
