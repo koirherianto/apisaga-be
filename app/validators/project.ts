@@ -3,7 +3,7 @@ import vine from '@vinejs/vine'
 export const projectIdValidator = vine.compile(
   vine
     .string()
-    .uuid()
+    .uuid({ version: [4] })
     .exists(async (db, value) => {
       const row = await db.from('projects').where('id', value).first()
       return row

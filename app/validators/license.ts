@@ -1,13 +1,15 @@
 import vine from '@vinejs/vine'
 import { uniqueCustom } from './costume/uniq.js'
+import ResponseError from '#exceptions/respon_error_exception'
 
 // uuid validator
 export const licenseIdValidator = vine.compile(
-    vine.string().uuid().exists(async (db, value) => {
+    vine.string().uuid({ version: [4] }).exists(async (db, value) => {
         const row = await db.from('licenses').where('id', value).first()
-        // if (!row) {
-        //     field.report('The {{ field }} field is not valid', 'uuid', field)
-        // }
+        if (!row) {
+            // field.report('The {{ field }} field is not valid', 'uuid', field)
+            throw new ResponseError('License not found', { status: 404 })
+        }
         return row
     })
 )

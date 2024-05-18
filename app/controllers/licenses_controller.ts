@@ -17,13 +17,6 @@ export default class LicensesController {
         await licenseIdValidator.validate(params.id)
         const license = await License.find(params.id)
 
-        if (!license) {
-            return response.status(404).json({
-                success: false,
-                message: 'License not found',
-            })
-        }
-
         return response.status(200).json({
             success: true,
             data: license,
@@ -34,6 +27,7 @@ export default class LicensesController {
     async store({ request, response }: HttpContext) {
         const validate = await request.validateUsing(createLicenseValidator)
         const license = await License.create({ name : validate.name })
+
         return response.status(201).json({
             success: true,
             data: license,
@@ -44,11 +38,10 @@ export default class LicensesController {
     async update({ request, response, params }: HttpContext) {
         const id = await licenseIdValidator.validate(params.id)
         const validate = await request.validateUsing(updateLicenseValidator(id))
-        
-        const license = await License.findOrFail(id)
+        const license = await License.find(id)
 
-        license.name = validate.name
-        await license.save()
+        license!.name = validate.name
+        await license!.save()
 
         return response.status(200).json({
             success: true,
