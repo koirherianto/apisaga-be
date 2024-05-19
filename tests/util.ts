@@ -1,4 +1,5 @@
 import License from '#models/license'
+import Project from '#models/project'
 import User from '#models/user'
 
 export interface TestUserResult {
@@ -38,4 +39,19 @@ export const removeTestLicense = async () => {
   const license = await License.findByOrFail('name', 'test license')
 
   license.delete()
+}
+
+export const createTestProject = async (user: User, license: License) => {
+  return await user.related('projects').create({
+    licenseId: license.id,
+    title: 'test',
+    type: 'version',
+    visibility: 'public',
+    description: 'test',
+  })
+}
+
+export const removeTestProject = async (projectId: string) => {
+  const project = await Project.findOrFail(projectId)
+  await project.delete()
 }

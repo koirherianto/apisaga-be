@@ -12,7 +12,7 @@ export default class ProjectsController {
     return response.ok({
       success: true,
       data: projects,
-      messages: 'Data fetched successfully',
+      message: 'Data fetched successfully',
     })
   }
 
@@ -23,7 +23,7 @@ export default class ProjectsController {
     return response.created({
       success: true,
       data: project,
-      messages: 'Data created successfully',
+      message: 'Project created successfully',
     })
   }
 
@@ -34,7 +34,7 @@ export default class ProjectsController {
     return response.status(200).json({
       success: true,
       data: project,
-      messages: 'Data fetched successfully',
+      message: 'Project fetched successfully',
     })
   }
 
@@ -49,7 +49,7 @@ export default class ProjectsController {
     return response.status(200).json({
       success: true,
       data: project,
-      messages: 'Data updated successfully',
+      message: 'Project updated successfully',
     })
   }
 
@@ -61,7 +61,7 @@ export default class ProjectsController {
     return response.status(200).json({
       success: true,
       data: project,
-      messages: 'Data deleted successfully',
+      message: 'Project deleted successfully',
     })
   }
 }
