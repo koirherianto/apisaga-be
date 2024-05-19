@@ -3,8 +3,8 @@ import { createTestLicense, createTestUser, removeTestLicense, removeTestUser, T
 import License from '#models/license'
 
 test.group('Licenses delete | DELETE | api/licenses/:id', async (group) => {
-  let testUser: TestUserResult | null = null
-  let testLicense: License | null = null
+  let testUser: TestUserResult
+  let testLicense: License
 
   group.each.setup(async () => {
     testUser = await createTestUser()

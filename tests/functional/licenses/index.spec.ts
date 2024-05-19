@@ -2,7 +2,7 @@ import { createTestLicense, createTestUser, removeTestLicense, removeTestUser, T
 import { test } from '@japa/runner'
 
 test.group('Licenses index API | GET | api/licenses', async (group) => {
-  let testUser: TestUserResult | null = null
+  let testUser: TestUserResult
 
   group.each.setup(async () => {
     testUser = await createTestUser()
