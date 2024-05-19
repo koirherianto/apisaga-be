@@ -18,8 +18,6 @@ test.group('Licenses index API | GET | api/licenses', async (group) => {
     const response = await client.get('/api/licenses')
       .bearerToken(testUser!.token)
 
-    console.log(response.body());
-
     expect(response.status()).toBe(200)
     expect(response.body().success).toBeTruthy()
     expect(response.body().data.length).toBeGreaterThan(0)
