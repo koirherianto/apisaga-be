@@ -42,17 +42,26 @@ export default class VersionsController {
   async store({ auth, request, params, response }: HttpContext) {
     const validate = await request.validateUsing(createVersionValidator)
     const project = await this.checkProjectMustExist(auth, params.slug)
-    let version = await this.checkVersionExist(project, validate.name)
+    const checkVersion = await this.checkVersionExist(project, validate.name)
 
-    if (version) {
+    if (checkVersion) {
       throw new ResponseError('Version name already exists', { status: 400 })
     }
 
-    version = await project!.related('versions').create({ ...validate, projectId: project.id })
+    const versio = await project!.related('versions').create({ ...validate, projectId: project.id })
+
+    if (validate.isDefault) {
+      // ubah versi default yang lain menjadi false
+      await project
+        .related('versions')
+        .query()
+        .where('id', '!=', versio.id)
+        .update({ isDefault: false })
+    }
 
     return response.created({
       success: true,
-      data: version,
+      data: versio,
       messages: 'Version created successfully',
     })
   }
@@ -67,15 +76,20 @@ export default class VersionsController {
       throw new ResponseError('Version not found', { status: 404 })
     }
 
-    if (validate.name) {
-      const isSame = await project.related('versions').query().where('name', validate.name).first()
-      // kecuai jika versi yang diupdate adalah versi yang sama
-      if (isSame && isSame.id !== version.id) {
-        return response.status(400).json({
-          success: false,
-          messages: 'Version name already exists',
-        })
-      }
+    // jika nama versi yang diupdate sudah ada di database
+    const isSame = await project.related('versions').query().where('name', validate.name).first()
+    // kecuali jika versi yang diupdate adalah versi yang sama
+    if (isSame && isSame.id !== version.id) {
+      throw new ResponseError('Version name already exists', { status: 400 })
+    }
+
+    if (validate.isDefault) {
+      // ubah versi default yang lain menjadi false
+      await project
+        .related('versions')
+        .query()
+        .where('id', '!=', version.id)
+        .update({ isDefault: false })
     }
 
     version.merge(validate)
