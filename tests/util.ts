@@ -1,6 +1,7 @@
 import License from '#models/license'
 import Project from '#models/project'
 import User from '#models/user'
+import Version from '#models/version'
 
 export interface TestUserResult {
   user: User
@@ -54,4 +55,18 @@ export const createTestProject = async (user: User, license: License) => {
 export const removeTestProject = async (projectId: string) => {
   const project = await Project.findOrFail(projectId)
   await project.delete()
+}
+
+export const createTestVersion = async (project: Project): Promise<Version> => {
+  return await project.related('versions').create({
+    name: '1.0.0',
+    isDefault: true,
+    visibility: 'public',
+    versionStatus: 'major',
+  })
+}
+
+export const removeTestVersion = async (versionId: string) => {
+  const version = await Version.findOrFail(versionId)
+  await version.delete()
 }

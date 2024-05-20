@@ -18,7 +18,7 @@ export default class VersionsController {
     return response.ok({
       success: true,
       data: versions,
-      messages: 'Versions fetched successfully',
+      message: 'Versions fetched successfully',
     })
   }
 
@@ -34,7 +34,7 @@ export default class VersionsController {
     return response.ok({
       success: true,
       data: version,
-      messages: 'Version fetched successfully',
+      message: 'Version fetched successfully',
     })
   }
 
@@ -62,7 +62,7 @@ export default class VersionsController {
     return response.created({
       success: true,
       data: versio,
-      messages: 'Version created successfully',
+      message: 'Version created successfully',
     })
   }
 
@@ -98,7 +98,7 @@ export default class VersionsController {
     return response.status(200).json({
       success: true,
       data: version,
-      messages: 'Data updated successfully',
+      message: 'Data updated successfully',
     })
   }
 
@@ -116,7 +116,7 @@ export default class VersionsController {
     return response.status(200).json({
       success: true,
       data: version,
-      messages: 'Data deleted successfully',
+      message: 'Data deleted successfully',
     })
   }
 
