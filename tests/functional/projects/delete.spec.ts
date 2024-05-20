@@ -11,7 +11,7 @@ import {
 } from '#tests/util'
 import { test } from '@japa/runner'
 
-test.group('Project show | GET | api/projects/:slug', async (group) => {
+test.group('Project delete | DELETE | api/projects/:slug', async (group) => {
   let testUser: TestUserResult
   let testProject: Project
   let testLicense: License
@@ -23,42 +23,42 @@ test.group('Project show | GET | api/projects/:slug', async (group) => {
   })
 
   group.each.teardown(async () => {
-    await removeTestProject(testProject.id)
     await removeTestLicense()
     await removeTestUser()
   })
 
-  test('should can get Project', async ({ client, expect }) => {
+  test('should can delete Project', async ({ client, expect }) => {
     const response = await client
-      .get('/api/projects/' + testProject!.slug)
+      .delete('/api/projects/' + testProject!.slug)
       .bearerToken(testUser!.token)
 
     const body = response.body()
-    console.log(body)
 
     expect(response.status()).toBe(200)
     expect(body.success).toBeTruthy()
-    expect(body.data.id).toBeDefined()
-    expect(body.data.title).toBe('test')
-    expect(body.data.slug).toBe('test')
-    expect(body.data.type).toBe('version')
-    expect(body.data.visibility).toBe('public')
-    expect(body.data.description).toBe('test')
-    expect(body.message).toBe('Project fetched successfully')
+    expect(body.data.id).toBe(testProject!.id)
+    expect(body.message).toBe('Project deleted successfully')
   })
 
   test('should return 404 if project not found', async ({ client, expect }) => {
     const response = await client
-      .get('/api/projects/' + 'invalid-project') // project not found
+      .delete('/api/projects/' + 'wrong-project') // slug not found
       .bearerToken(testUser!.token)
 
     expect(response.status()).toBe(404)
+    expect(response.body().message).toBe('Project not found')
+
+    await removeTestProject(testProject.id)
   })
 
   test('should return 401 if token is wrong', async ({ client, expect }) => {
-    const response = await client.get('/api/projects/' + testProject!.id).bearerToken('wrong token')
+    const response = await client
+      .delete('/api/projects/' + testProject!.id)
+      .bearerToken('wrong token')
 
     expect(response.status()).toBe(401)
     expect(response.body().errors).toBeDefined()
+
+    await removeTestProject(testProject.id)
   })
 })
