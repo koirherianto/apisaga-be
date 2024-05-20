@@ -6,9 +6,14 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().notNullable()
+      table
+        .uuid('version_id')
+        .notNullable()
+        .references('id')
+        .inTable('versions')
+        .onDelete('CASCADE')
       table.string('name', 100).notNullable()
       table.tinyint('order').notNullable()
-
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at')
       table.timestamp('deleted_at')

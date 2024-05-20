@@ -8,26 +8,33 @@ import Project from '#models/project'
 export default class VersionsController {
   // /project/:slug/version
   async index({ auth, params, response }: HttpContext) {
-    // throw new ResponseError('Projects not found', { status: 400 })
     const project = await this.checkProjectMustExist(auth, params.slug)
-    const versions = await project!.related('versions').query()
+    const versions = await project!
+      .related('versions')
+      .query()
+      .preload('sidebarSeparator')
+      .preload('sidebarItem')
 
     return response.ok({
       success: true,
       data: versions,
-      messages: 'Data fetched successfully',
+      messages: 'Versions fetched successfully',
     })
   }
 
   // /projects/:slug/version/:version
   async show({ auth, params, response }: HttpContext) {
     const project = await this.checkProjectMustExist(auth, params.slug)
-    const version = await project!.related('versions').query().where('name', params.version).first()
+    const version = await this.checkVersionExist(project, params.version)
+
+    if (!version) {
+      throw new ResponseError('Version not found', { status: 404 })
+    }
 
     return response.ok({
       success: true,
       data: version,
-      messages: 'Data fetched successfully',
+      messages: 'Version fetched successfully',
     })
   }
 
@@ -35,23 +42,18 @@ export default class VersionsController {
   async store({ auth, request, params, response }: HttpContext) {
     const validate = await request.validateUsing(createVersionValidator)
     const project = await this.checkProjectMustExist(auth, params.slug)
-    const isSame = await project.related('versions').query().where('name', validate.name).first()
+    let version = await this.checkVersionExist(project, validate.name)
 
-    if (isSame) {
-      return response.status(400).json({
-        success: false,
-        messages: 'Version name already exists',
-      })
+    if (version) {
+      throw new ResponseError('Version name already exists', { status: 400 })
     }
 
-    const version = await project!
-      .related('versions')
-      .create({ ...validate, projectId: project.id })
+    version = await project!.related('versions').create({ ...validate, projectId: project.id })
 
     return response.created({
       success: true,
       data: version,
-      messages: 'Data created successfully',
+      messages: 'Version created successfully',
     })
   }
 
@@ -59,14 +61,10 @@ export default class VersionsController {
   async update({ auth, request, params, response }: HttpContext) {
     const validate = await request.validateUsing(updateVersionValidator)
     const project = await this.checkProjectMustExist(auth, params.slug)
-
-    const version = await project!.related('versions').query().where('name', params.version).first()
+    const version = await this.checkVersionExist(project, params.version)
 
     if (!version) {
-      return response.status(404).json({
-        success: false,
-        messages: 'Data not found',
-      })
+      throw new ResponseError('Version not found', { status: 404 })
     }
 
     if (validate.name) {
@@ -93,13 +91,10 @@ export default class VersionsController {
   // /projects/:slug/version/:version
   async destroy({ auth, params, response }: HttpContext) {
     const project = await this.checkProjectMustExist(auth, params.slug)
-    const version = await project!.related('versions').query().where('name', params.version).first()
+    const version = await this.checkVersionExist(project, params.version)
 
     if (!version) {
-      return response.status(404).json({
-        success: false,
-        messages: 'Data not found',
-      })
+      throw new ResponseError('Version not found', { status: 404 })
     }
 
     await version.delete()
@@ -121,14 +116,20 @@ export default class VersionsController {
     return project
   }
 
-  isSemanticVersion(version: string): boolean {
-    const semverRegex = new RegExp(
-      '^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)' + // MAJOR.MINOR.PATCH
-        '(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)' + // Pre-release
-        '(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?' + // (more pre-release)
-        '(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$' // Build metadata
-    )
+  // apakah versi sudah ada di database
+  async checkVersionExist(project: Project, version: string): Promise<any> {
+    const isExist = await project
+      .related('versions')
+      .query()
+      .preload('sidebarItem')
+      .preload('sidebarSeparator')
+      .where('name', version)
+      .first()
 
-    return semverRegex.test(version)
+    if (!isExist) {
+      return false
+    }
+
+    return isExist
   }
 }

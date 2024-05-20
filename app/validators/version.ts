@@ -5,7 +5,7 @@ export const versio = vine.compile(vine.string())
 export const createVersionValidator = vine.compile(
   vine.object({
     name: vine.string().trim().minLength(4).maxLength(100),
-    isDefault: vine.boolean().optional(),
+    isDefault: vine.boolean(),
     versionStatus: vine.enum(['major', 'minor', 'patch']).optional(),
     visibility: vine.enum(['public', 'private']),
   })
@@ -13,9 +13,9 @@ export const createVersionValidator = vine.compile(
 
 export const updateVersionValidator = vine.compile(
   vine.object({
-    name: vine.string().trim().minLength(4).maxLength(100).optional(),
-    isDefault: vine.boolean().optional(),
+    name: vine.string().trim().minLength(4).maxLength(100),
+    isDefault: vine.boolean(),
     versionStatus: vine.enum(['major', 'minor', 'patch']).optional(),
-    visibility: vine.enum(['public', 'private']).optional(),
+    visibility: vine.enum(['public', 'private']),
   })
 )
