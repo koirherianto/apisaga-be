@@ -4,6 +4,7 @@ import {
   createTestLicense,
   createTestProject,
   createTestUser,
+  removeTestLicense,
   removeTestProject,
   removeTestUser,
   TestUserResult,
@@ -23,6 +24,7 @@ test.group('Project show | GET | api/projects/:id', async (group) => {
 
   group.each.teardown(async () => {
     await removeTestProject(testProject.id)
+    await removeTestLicense()
     await removeTestUser()
   })
 
@@ -32,6 +34,7 @@ test.group('Project show | GET | api/projects/:id', async (group) => {
       .bearerToken(testUser!.token)
 
     const body = response.body()
+    console.log(body)
 
     expect(response.status()).toBe(200)
     expect(body.success).toBeTruthy()
@@ -44,12 +47,10 @@ test.group('Project show | GET | api/projects/:id', async (group) => {
     expect(body.message).toBe('Project fetched successfully')
   })
 
-  test('should return 422 if project not found', async ({ client, expect }) => {
+  test('should return 404 if project not found', async ({ client, expect }) => {
     const response = await client
-      .get('/api/projects/' + '1234-1234-1234-1234') // invalid uuid
+      .get('/api/projects/' + 'invalid-project') // project not found
       .bearerToken(testUser!.token)
-
-    console.log(response.body())
 
     expect(response.status()).toBe(404)
   })
