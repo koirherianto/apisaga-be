@@ -37,9 +37,9 @@ export const createProjectValidator = vine.compile(
 export const updateProjectValidator = vine.compile(
   vine.object({
     licenseId: vine.string().trim().uuid().optional(),
-    title: vine.string().trim().minLength(4).maxLength(100).optional(),
-    type: vine.enum(['version', 'brance']).optional(),
-    visibility: vine.enum(['public', 'private']).optional(),
+    title: vine.string().trim().minLength(4).maxLength(100),
+    type: vine.enum(['version', 'brance']),
+    visibility: vine.enum(['public', 'private']),
     description: vine.string().trim().optional(),
   })
 )
