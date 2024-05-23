@@ -123,7 +123,7 @@ export default class VersionsController {
     const project = await auth.user!.related('projects').query().where('slug', slug).first()
 
     if (!project) {
-      throw new ResponseError('Projects not found', { status: 404 })
+      throw new ResponseError('Project not found', { status: 404 })
     }
 
     return project
