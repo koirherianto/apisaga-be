@@ -25,7 +25,7 @@ export default class SidebarItem extends BaseModel {
   declare order: number
 
   @column()
-  declare content: string
+  declare content: string | null
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -34,11 +34,25 @@ export default class SidebarItem extends BaseModel {
   declare updatedAt: DateTime
 
   @beforeCreate()
-  static assignUuid(sidebarItem: SidebarItem) {
+  static async assignUuid(sidebarItem: SidebarItem) {
     sidebarItem.id = crypto.randomUUID()
 
-    if (!sidebarItem.slug) {
-      sidebarItem.slug = string.slug(sidebarItem.name)
+    if (sidebarItem.name) {
+      const baseSlug = string.slug(sidebarItem.name)
+      let slug = baseSlug
+      let count = 1
+
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const existingSeparator = await SidebarItem.query().where('slug', slug).first()
+        if (!existingSeparator || existingSeparator.id === sidebarItem.id) {
+          break
+        }
+        slug = `${baseSlug}-${count}`
+        count++
+      }
+
+      sidebarItem.slug = slug
     }
   }
 
@@ -46,7 +60,7 @@ export default class SidebarItem extends BaseModel {
   declare version: BelongsTo<typeof Version>
 
   @belongsTo(() => SidebarSeparator, {
-    foreignKey: 'sidebar_separator_id',
+    foreignKey: 'sidebarSeparatorId',
   })
   declare sidebarSeparator: BelongsTo<typeof SidebarSeparator>
 }
