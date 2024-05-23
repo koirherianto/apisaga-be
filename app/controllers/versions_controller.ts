@@ -6,7 +6,6 @@ import ResponseError from '#exceptions/respon_error_exception'
 import Project from '#models/project'
 
 export default class VersionsController {
-  // /project/:slug/version
   async index({ auth, params, response }: HttpContext) {
     const project = await this.checkProjectMustExist(auth, params.slug)
     const versions = await project!
@@ -45,7 +44,7 @@ export default class VersionsController {
     const checkVersion = await this.checkVersionExist(project, validate.name)
 
     if (checkVersion) {
-      throw new ResponseError('Version name already exists', { status: 400 })
+      throw new ResponseError('Version name already exists', { status: 409 })
     }
 
     const versio = await project!.related('versions').create({ ...validate, projectId: project.id })
@@ -80,7 +79,7 @@ export default class VersionsController {
     const isSame = await project.related('versions').query().where('name', validate.name).first()
     // kecuali jika versi yang diupdate adalah versi yang sama
     if (isSame && isSame.id !== version.id) {
-      throw new ResponseError('Version name already exists', { status: 400 })
+      throw new ResponseError('Version name already exists', { status: 409 })
     }
 
     if (validate.isDefault) {
@@ -98,7 +97,7 @@ export default class VersionsController {
     return response.status(200).json({
       success: true,
       data: version,
-      message: 'Data updated successfully',
+      message: 'Version updated successfully',
     })
   }
 
@@ -116,7 +115,7 @@ export default class VersionsController {
     return response.status(200).json({
       success: true,
       data: version,
-      message: 'Data deleted successfully',
+      message: 'Version deleted successfully',
     })
   }
 

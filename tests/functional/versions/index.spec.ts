@@ -14,7 +14,7 @@ import {
 } from '#tests/util'
 import { test } from '@japa/runner'
 
-test.group('Versions Index API | GET | api/projects', async (group) => {
+test.group('Versions Index API | GET | api/projects/:projectSlug/version', async (group) => {
   let testUser: TestUserResult
   let testLicense: License
   let testProject: Project
@@ -44,7 +44,6 @@ test.group('Versions Index API | GET | api/projects', async (group) => {
     expect(response.body().message).toBeDefined()
   })
 
-  // reject when slug is wrong
   test('Should reject if slug is wrong', async ({ client, expect }) => {
     const response = await client
       .get('/api/projects/wrong-slug/version')
