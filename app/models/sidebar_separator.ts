@@ -3,6 +3,7 @@ import { BaseModel, beforeCreate, belongsTo, column, hasMany } from '@adonisjs/l
 import Version from './version.js'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import SidebarItem from './sidebar_item.js'
+import string from '@adonisjs/core/helpers/string'
 
 export default class SidebarSeparator extends BaseModel {
   @column({ isPrimary: true })
@@ -15,6 +16,9 @@ export default class SidebarSeparator extends BaseModel {
   declare name: string
 
   @column()
+  declare slug: String
+
+  @column()
   declare order: number
 
   @column.dateTime({ autoCreate: true })
@@ -24,9 +28,48 @@ export default class SidebarSeparator extends BaseModel {
   declare updatedAt: DateTime
 
   @beforeCreate()
-  static assignUuid(sidebarSeparator: SidebarSeparator) {
+  static async assignUuid(sidebarSeparator: SidebarSeparator) {
     sidebarSeparator.id = crypto.randomUUID()
+
+    if (sidebarSeparator.name) {
+      const baseSlug = string.slug(sidebarSeparator.name)
+      let slug = baseSlug
+      let count = 1
+
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const existingSeparator = await SidebarSeparator.query().where('slug', slug).first()
+        if (!existingSeparator || existingSeparator.id === sidebarSeparator.id) {
+          break
+        }
+        slug = `${baseSlug}-${count}`
+        count++
+      }
+
+      sidebarSeparator.slug = slug
+    }
   }
+
+  // @beforeUpdate()
+  // static async assignSlug(sidebarSeparator: SidebarSeparator) {
+  //   if (sidebarSeparator.$dirty.name) {
+  //     const baseSlug = string.slug(sidebarSeparator.name)
+  //     let slug = baseSlug
+  //     let count = 1
+
+  //     // eslint-disable-next-line no-constant-condition
+  //     while (true) {
+  //       const existingSeparator = await SidebarSeparator.query().where('slug', slug).first()
+  //       if (!existingSeparator || existingSeparator.id === sidebarSeparator.id) {
+  //         break
+  //       }
+  //       slug = `${baseSlug}-${count}`
+  //       count++
+  //     }
+
+  //     sidebarSeparator.slug = slug
+  //   }
+  // }
 
   @belongsTo(() => Version)
   declare version: BelongsTo<typeof Version>

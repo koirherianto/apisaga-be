@@ -20,6 +20,7 @@ export default class extends BaseSchema {
         .nullable()
       table.text('content').nullable()
       table.string('name', 100).notNullable()
+      table.string('slug', 150).notNullable()
       table.tinyint('order').notNullable()
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at')

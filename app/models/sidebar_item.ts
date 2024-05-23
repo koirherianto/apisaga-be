@@ -3,6 +3,7 @@ import { BaseModel, beforeCreate, belongsTo, column } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import Version from '#models/version'
 import SidebarSeparator from '#models/sidebar_separator'
+import string from '@adonisjs/core/helpers/string'
 
 export default class SidebarItem extends BaseModel {
   @column({ isPrimary: true })
@@ -16,6 +17,9 @@ export default class SidebarItem extends BaseModel {
 
   @column()
   declare name: string
+
+  @column()
+  declare slug: string
 
   @column()
   declare order: number
@@ -32,6 +36,10 @@ export default class SidebarItem extends BaseModel {
   @beforeCreate()
   static assignUuid(sidebarItem: SidebarItem) {
     sidebarItem.id = crypto.randomUUID()
+
+    if (!sidebarItem.slug) {
+      sidebarItem.slug = string.slug(sidebarItem.name)
+    }
   }
 
   @belongsTo(() => Version)

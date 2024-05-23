@@ -5,6 +5,7 @@ const AuthController = () => import('#controllers/auth_controller')
 const LicensesController = () => import('#controllers/licenses_controller')
 const ProjectsController = () => import('#controllers/projects_controller')
 const VersionsController = () => import('#controllers/versions_controller')
+const SidebarSeparator = () => import('#controllers/sidebar_separators_controller')
 import router from '@adonisjs/core/services/router'
 
 router.get('/', async () => {
@@ -28,5 +29,13 @@ router.group(() => {
     router.put('/projects/:slug/version/:version', [VersionsController, 'update'])
     router.delete('/projects/:slug/version/:version', [VersionsController, 'destroy'])
 
+    router.get('/projects/:projectSlug/version/:version/sidebar-separator', [SidebarSeparator, 'index'])
+    router.post('/projects/:slug/version/:version/sidebar-separator', [SidebarSeparator, 'store'])
+    router.get('/projects/:projectSlug/version/:version/sidebar-separator/:separatorSlug', [SidebarSeparator, 'show'])
+    router.put('/projects/:projectSlug/version/:version/sidebar-separator/:separatorSlug', [SidebarSeparator, 'update'])
+    router.delete('/projects/:projectSlug/version/:version/sidebar-separator/:separatorSlug', [SidebarSeparator, 'destroy'])
+
   }).use(middleware.auth())
+
+  
 }).prefix('api')
