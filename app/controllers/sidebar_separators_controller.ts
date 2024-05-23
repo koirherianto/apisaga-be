@@ -71,6 +71,8 @@ export default class SidebarSeparatorsController {
       await separators[i].save()
     }
 
+    // catatan ordernya seharusnya diurutkan berdasarkan order request, kalau ini cuman menurutkan berdasarkan id
+
     return response.ok({
       success: true,
       data: separator,
