@@ -74,7 +74,7 @@ export default class SidebarItemsController {
   }
 
   async destroy({ auth, params, response }: HttpContext) {
-    const version = await this.checkVersionMustExist(auth, params.slug, params.version)
+    const version = await this.checkVersionMustExist(auth, params.projectSlug, params.version)
     const item = await this.checkItemMustExist(version, params.itemSlug)
 
     await item.delete()
@@ -95,9 +95,9 @@ export default class SidebarItemsController {
   }
 
   async attachToSeparator({ auth, params, response }: HttpContext) {
-    const version = await this.checkVersionMustExist(auth, params.slug, params.version)
-    const item = await this.checkItemMustExist(version, params.itemSlug)
+    const version = await this.checkVersionMustExist(auth, params.projectSlug, params.version)
     const separator = await this.checkSeparatorMustExist(version, params.separatorSlug)
+    const item = await this.checkItemMustExist(version, params.itemSlug)
 
     item.sidebarSeparatorId = separator.id
     await item.save()
@@ -109,7 +109,7 @@ export default class SidebarItemsController {
   }
 
   async detachFromSeparator({ auth, params, response }: HttpContext) {
-    const version = await this.checkVersionMustExist(auth, params.slug, params.version)
+    const version = await this.checkVersionMustExist(auth, params.projectSlug, params.version)
     const item = await this.checkItemMustExist(version, params.itemSlug)
 
     item.sidebarSeparatorId = null

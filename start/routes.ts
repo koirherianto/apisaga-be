@@ -42,11 +42,11 @@ router.group(() => {
     router.post('/projects/:projectSlug/version/:version/sidebar-items', [SidebarItem, 'store'])
     router.get('/projects/:projectSlug/version/:version/sidebar-items/:itemSlug', [SidebarItem, 'show'])
     router.put('/projects/:projectSlug/version/:version/sidebar-items/:itemSlug', [SidebarItem, 'update'])
-    router.delete('/projects/:slug/version/:version/sidebar-items/:itemSlug', [SidebarItem, 'destroy'])
+    router.delete('/projects/:projectSlug/version/:version/sidebar-items/:itemSlug', [SidebarItem, 'destroy'])
 
     // Relationship Management Routes
-    router.post('/projects/:slug/version/:version/sidebar-separators/:separatorSlug/sidebar-items/:itemSlug', [SidebarItem, 'attachToSeparator'])
-    router.delete('/projects/:slug/version/:version/sidebar-separators/:separatorSlug/sidebar-items/:itemSlug', [SidebarItem, 'detachFromSeparator'])
+    router.post('/projects/:projectSlug/version/:version/sidebar-separators/:separatorSlug/sidebar-items/:itemSlug', [SidebarItem, 'attachToSeparator'])
+    router.delete('/projects/:projectSlug/version/:version/sidebar-separators/:separatorSlug/sidebar-items/:itemSlug', [SidebarItem, 'detachFromSeparator'])
 
   }).use(middleware.auth())
 
