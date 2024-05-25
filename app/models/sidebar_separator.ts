@@ -32,7 +32,7 @@ export default class SidebarSeparator extends BaseModel {
     sidebarSeparator.id = crypto.randomUUID()
 
     if (sidebarSeparator.name) {
-      const baseSlug = string.slug(sidebarSeparator.name)
+      const baseSlug = string.slug(sidebarSeparator.name, { lower: true })
       let slug = baseSlug
       let count = 1
 

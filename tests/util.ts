@@ -2,6 +2,7 @@ import License from '#models/license'
 import Project from '#models/project'
 import User from '#models/user'
 import Version from '#models/version'
+import SidebarSeparator from '#models/sidebar_separator'
 
 export interface TestUserResult {
   user: User
@@ -69,4 +70,24 @@ export const createTestVersion = async (project: Project): Promise<Version> => {
 export const removeTestVersion = async (versionId: string) => {
   const version = await Version.findOrFail(versionId)
   await version.delete()
+}
+
+export async function createTestSidebarSeparator(
+  version: Version,
+  name: string = 'Test Separator'
+): Promise<SidebarSeparator> {
+  return SidebarSeparator.create({
+    versionId: version.id,
+    name,
+    order: 1,
+  })
+}
+
+export async function removeTestSidebarSeparator(separatorId: string): Promise<boolean> {
+  const separator = await SidebarSeparator.find(separatorId)
+  if (separator) {
+    await separator.delete()
+    return false
+  }
+  return true
 }

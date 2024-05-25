@@ -38,7 +38,7 @@ export default class SidebarItem extends BaseModel {
     sidebarItem.id = crypto.randomUUID()
 
     if (sidebarItem.name) {
-      const baseSlug = string.slug(sidebarItem.name)
+      const baseSlug = string.slug(sidebarItem.name, { lower: true })
       let slug = baseSlug
       let count = 1
 

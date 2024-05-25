@@ -45,7 +45,7 @@ export default class Project extends BaseModel {
     project.id = crypto.randomUUID()
 
     if (!project.slug) {
-      project.slug = string.slug(project.title)
+      project.slug = string.slug(project.title, { lower: true })
     }
   }
 
