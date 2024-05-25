@@ -3,6 +3,7 @@ import Project from '#models/project'
 import User from '#models/user'
 import Version from '#models/version'
 import SidebarSeparator from '#models/sidebar_separator'
+import SidebarItem from '#models/sidebar_item'
 
 export interface TestUserResult {
   user: User
@@ -90,4 +91,23 @@ export async function removeTestSidebarSeparator(separatorId: string): Promise<b
     return false
   }
   return true
+}
+
+export async function createTestSidebarItem(version: Version): Promise<SidebarItem> {
+  const sidebarItem = await SidebarItem.create({
+    versionId: version.id,
+    name: 'Test Sidebar Item',
+    slug: 'test-sidebar-item',
+    content: '## Test Content\nThis is a test content.',
+    order: 1,
+  })
+
+  return sidebarItem
+}
+
+export async function removeTestSidebarItem(sidebarItemId: string): Promise<void> {
+  const sidebarItem = await SidebarItem.find(sidebarItemId)
+  if (sidebarItem) {
+    await sidebarItem.delete()
+  }
 }
