@@ -1,6 +1,5 @@
 /* eslint-disable prettier/prettier */
 
-import { middleware } from '#start/kernel'
 const AuthController = () => import('#controllers/auth_controller')
 const LicensesController = () => import('#controllers/licenses_controller')
 const ProjectsController = () => import('#controllers/projects_controller')
@@ -16,6 +15,14 @@ router.get('/', async () => {
 router.group(() => {
   router.post('/register', [AuthController, 'register'])
   router.post('/login', [AuthController, 'login'])
+
+  router.get('tes', async ({ auth}) => {
+    if (await auth.check()) {
+      return 'logged in'
+    }
+
+    return 'y'
+  })
 
   router.group(() => {
     router.get('/me', [AuthController, 'me'])
@@ -48,7 +55,8 @@ router.group(() => {
     router.post('/projects/:projectSlug/version/:version/sidebar-separators/:separatorSlug/sidebar-items/:itemSlug', [SidebarItem, 'attachToSeparator'])
     router.delete('/projects/:projectSlug/version/:version/sidebar-separators/:separatorSlug/sidebar-items/:itemSlug', [SidebarItem, 'detachFromSeparator'])
 
-  }).use(middleware.auth())
+  })
+  // }).use(middleware.auth())
 
   
 }).prefix('api')
