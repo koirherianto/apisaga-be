@@ -4,21 +4,34 @@ import { Authenticators } from '@adonisjs/auth/types'
 import type { HttpContext } from '@adonisjs/core/http'
 import ResponseError from '#exceptions/respon_error_exception'
 import Project from '#models/project'
+import Version from '#models/version'
 
 export default class VersionsController {
   async index({ auth, params, response }: HttpContext) {
-    const project = await this.checkProjectMustExist(auth, params.slug)
-    const versions = await project!
-      .related('versions')
-      .query()
-      .preload('sidebarSeparator')
-      .preload('sidebarItem')
+    const isLogin = await auth.check()
+    if (isLogin) {
+      const project = await this.checkProjectMustExist(auth, params.slug)
+      const versions = await project!
+        .related('versions')
+        .query()
+        .preload('sidebarSeparator')
+        .preload('sidebarItem')
 
-    return response.ok({
-      success: true,
-      data: versions,
-      message: 'Versions fetched successfully',
-    })
+      return response.ok({
+        success: true,
+        data: versions,
+        isLogin,
+        message: 'Versions fetched successfully',
+      })
+    } else {
+      const versions = await Version.query().preload('sidebarSeparator').preload('sidebarItem')
+      return response.ok({
+        success: true,
+        data: versions,
+        isLogin,
+        message: 'Versions fetched successfully',
+      })
+    }
   }
 
   // /projects/:slug/version/:version

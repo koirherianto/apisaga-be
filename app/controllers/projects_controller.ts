@@ -15,7 +15,7 @@ export default class ProjectsController {
 
       return response.ok({
         success: true,
-        authorized: isLogin,
+        isLogin,
         data: projects,
         message: 'Data fetched successfully',
       })
@@ -26,7 +26,7 @@ export default class ProjectsController {
         .preload('license')
       return response.status(200).json({
         success: true,
-        authorized: isLogin,
+        isLogin,
         data: projects,
         message: 'Data fetched successfully',
       })
@@ -45,14 +45,34 @@ export default class ProjectsController {
   }
 
   async show({ auth, response, params }: HttpContext) {
-    const slug = await projectSlugValidator.validate(params.id)
-    const project = await auth.user!.related('projects').query().where('slug', slug).first()
+    const isLogin = await auth.check()
+    const slug = await projectSlugValidator.validate(params.slug)
+    if (isLogin) {
+      // redirect ke project dengan versi terbaru seharusnya
 
-    return response.status(200).json({
-      success: true,
-      data: project,
-      message: 'Project fetched successfully',
-    })
+      const project = await auth
+        .user!.related('projects')
+        .query()
+        .preload('versions')
+        .where('slug', slug)
+        .first()
+
+      return response.status(200).json({
+        success: true,
+        data: project,
+        isLogin,
+        message: 'Project fetched successfully',
+      })
+    } else {
+      const project = await Project.query().preload('versions').where('slug', slug).first()
+
+      return response.status(200).json({
+        success: true,
+        data: project,
+        isLogin,
+        message: 'Project fetched successfully',
+      })
+    }
   }
 
   async update({ auth, request, response, params }: HttpContext) {

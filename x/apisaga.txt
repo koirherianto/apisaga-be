@@ -53,7 +53,7 @@ http://103.127.98.191/
  || akan mengakses auth/me [GET]
 
 + pengguna akan mengakses update data profil
-- diarahkan ke beranda
+- 
 // /u/:username
  || akan mengakses auth/me [POST]
 
@@ -64,8 +64,8 @@ http://103.127.98.191/
 
 --------------------------------------------------------
 
-+ Halaman Beranda (menampilkan semua project pribadi)
-- Halaman Beranda (menampilkan Project Paling Populer dan pribadi)
++ Halaman Beranda (menampilkan semua project Paling Populer dan pribadi)
+- Halaman Beranda (menampilkan project Paling Populer)
 // /
  || akan mengakses /project [GET]
 
@@ -79,7 +79,7 @@ http://103.127.98.191/
  || akan mengakses /project/:project-slug [GET]
 
 + pengguna dapat memperbarui edit data project
-- mengakses project anonym (hanya dapat melihat)
+- 
 // /
  || akan mengakses /project/:project-slug [UPDATE]
 
@@ -97,7 +97,7 @@ http://103.127.98.191/
 
 + pengguna dapat melihat semua versi pada suatu project
 - pengguna dapat melihat semua versi pada suatu project yang dipublish
-// /:project-slug/:version
+// /:project-slug/:version atau /:project-slug/
  || akan mengakses /project/:project-slug/version [GET]
 
 + pengguna dapat memilih versi pada projectnya (memiliki hak akses edit) (ke default halaman primary)
@@ -114,6 +114,19 @@ http://103.127.98.191/
 -
 // /:project-slug/:version
  || akan mengakses /project/:project-slug/version/:version [DELETE]
+
+--------------------------------------------------------------------
++ pengguna dapat melihat konten (dengan fitur edit WYSIWYG)
+- hanya bisa melihat blog
+// /:project-slug/:version/:item-slug
+ || akan mengakses /project/:project-slug/version/:version/sidebar-items/:item-slug
+
+
++ pengguna dapat membuat sidebar item baru
+- 
+// /:project-slug/:version/:item-slug
+  || akan mengakses /project/:project-slug/version/:version/sidebar-items
+	
 
 
 
