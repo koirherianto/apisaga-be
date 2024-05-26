@@ -16,29 +16,25 @@ router.get('/', async () => {
 router.group(() => {
   router.post('/register', [AuthController, 'register'])
   router.post('/login', [AuthController, 'login'])
+  
+  router.get('/projects', [ProjectsController, 'index'])
 
-  router.get('tes', async ({ auth}) => {
-    if (await auth.check()) {
-      return 'logged in'
-    }
+  
 
-    return 'y'
-  })
-
-  router.group(() => {
-    // apakah bisa di akses tanpa token
-    router.get('/me', [AuthController, 'me']) //no
-    router.delete('/logout', [AuthController, 'logout']) //no
-
-    // tidak bisa diakses tanpa token
-    // untuk mendapatkan data dari licen harus terhubung ke project
+  router.group(() => { // Authenticated routes
+    router.get('/me', [AuthController, 'me']) 
+    router.delete('/logout', [AuthController, 'logout']) 
     router.resource('/licenses', LicensesController)
-
     
-    router.resource('/projects', ProjectsController)
+    // Project Routes
+    router.get('/projects/:slug/version', [VersionsController, 'index'])
+    router.get('/projects/:slug/version/:version', [VersionsController, 'show'])
+    router.post('/projects', [ProjectsController, 'store'])
+    router.get('/projects/:slug', [ProjectsController, 'show'])
+    router.put('/projects/:slug', [ProjectsController, 'update'])
+    router.delete('/projects/:slug', [ProjectsController, 'destroy'])
 
-    router.get('/projects/:slug/version', [VersionsController, 'index']) //yes
-    router.get('/projects/:slug/version/:version', [VersionsController, 'show']) //yes
+    // Version Routes
     router.post('/projects/:slug/version', [VersionsController, 'store'])
     router.put('/projects/:slug/version/:version', [VersionsController, 'update'])
     router.delete('/projects/:slug/version/:version', [VersionsController, 'destroy'])

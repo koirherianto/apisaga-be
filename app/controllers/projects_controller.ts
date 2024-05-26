@@ -1,3 +1,4 @@
+import Project from '#models/project'
 import {
   createProjectValidator,
   projectSlugValidator,
@@ -7,13 +8,29 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 export default class ProjectsController {
   async index({ auth, response }: HttpContext) {
-    const projects = await auth.user!.related('projects').query().preload('license')
+    const isLogin = await auth.check()
 
-    return response.ok({
-      success: true,
-      data: projects,
-      message: 'Data fetched successfully',
-    })
+    if (isLogin) {
+      const projects = await auth.user!.related('projects').query().preload('license')
+
+      return response.ok({
+        success: true,
+        authorized: isLogin,
+        data: projects,
+        message: 'Data fetched successfully',
+      })
+    } else {
+      const projects = await Project.query()
+        .orderBy('created_at', 'desc')
+        .limit(5)
+        .preload('license')
+      return response.status(200).json({
+        success: true,
+        authorized: isLogin,
+        data: projects,
+        message: 'Data fetched successfully',
+      })
+    }
   }
 
   async store({ auth, request, response }: HttpContext) {
