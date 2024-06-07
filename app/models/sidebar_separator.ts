@@ -1,16 +1,16 @@
 import { DateTime } from 'luxon'
 import { BaseModel, beforeCreate, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
-import Version from './version.js'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import SidebarItem from './sidebar_item.js'
 import string from '@adonisjs/core/helpers/string'
+import TobBar from './tob_bar.js'
 
 export default class SidebarSeparator extends BaseModel {
   @column({ isPrimary: true })
   declare id: string
 
   @column()
-  declare versionId: string
+  declare topBarId: string
 
   @column()
   declare name: string
@@ -71,8 +71,8 @@ export default class SidebarSeparator extends BaseModel {
   //   }
   // }
 
-  @belongsTo(() => Version)
-  declare version: BelongsTo<typeof Version>
+  @belongsTo(() => TobBar)
+  declare topBars: BelongsTo<typeof TobBar>
 
   @hasMany(() => SidebarItem)
   declare sidebarItems: HasMany<typeof SidebarItem>
