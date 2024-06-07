@@ -13,7 +13,7 @@ router.get('/', async () => {
   return { message: 'Hello world' }
 })
 
-router.group(() => {
+router.group(() => {  
   router.post('/register', [AuthController, 'register'])
   router.post('/login', [AuthController, 'login'])
   
