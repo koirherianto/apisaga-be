@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import { BaseModel, beforeCreate, belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
 import Project from '#models/project'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
-import TobBar from './tob_bar.js'
+import TopBar from './top_bar.js'
 
 export default class Version extends BaseModel {
   @column({ isPrimary: true })
@@ -34,8 +34,8 @@ export default class Version extends BaseModel {
     version.id = crypto.randomUUID()
   }
 
-  @hasMany(() => TobBar)
-  declare topBars: HasMany<typeof TobBar>
+  @hasMany(() => TopBar)
+  declare topBars: HasMany<typeof TopBar>
 
   @belongsTo(() => Project)
   declare project: BelongsTo<typeof Project>

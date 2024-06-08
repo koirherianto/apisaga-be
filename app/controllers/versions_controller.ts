@@ -11,11 +11,7 @@ export default class VersionsController {
     const isLogin = await auth.check()
     if (isLogin) {
       const project = await this.checkProjectMustExist(auth, params.slug)
-      const versions = await project!
-        .related('versions')
-        .query()
-        .preload('sidebarSeparator')
-        .preload('sidebarItem')
+      const versions = await project!.related('versions').query().preload('topBars')
 
       return response.ok({
         success: true,
@@ -24,7 +20,7 @@ export default class VersionsController {
         message: 'Versions fetched successfully',
       })
     } else {
-      const versions = await Version.query().preload('sidebarSeparator').preload('sidebarItem')
+      const versions = await Version.query().preload('topBars')
       return response.ok({
         success: true,
         data: versions,
@@ -147,8 +143,7 @@ export default class VersionsController {
     const isExist = await project
       .related('versions')
       .query()
-      .preload('sidebarItem')
-      .preload('sidebarSeparator')
+      .preload('topBars')
       .where('name', version)
       .first()
 

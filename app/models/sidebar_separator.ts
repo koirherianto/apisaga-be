@@ -3,7 +3,7 @@ import { BaseModel, beforeCreate, belongsTo, column, hasMany } from '@adonisjs/l
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import SidebarItem from './sidebar_item.js'
 import string from '@adonisjs/core/helpers/string'
-import TobBar from './tob_bar.js'
+import TopBar from './top_bar.js'
 
 export default class SidebarSeparator extends BaseModel {
   @column({ isPrimary: true })
@@ -71,8 +71,8 @@ export default class SidebarSeparator extends BaseModel {
   //   }
   // }
 
-  @belongsTo(() => TobBar)
-  declare topBars: BelongsTo<typeof TobBar>
+  @belongsTo(() => TopBar)
+  declare topBars: BelongsTo<typeof TopBar>
 
   @hasMany(() => SidebarItem)
   declare sidebarItems: HasMany<typeof SidebarItem>

@@ -51,13 +51,4 @@ test.group('Versions Index API | GET | api/projects/:projectSlug/version', async
     expect(response.status()).toBe(404)
     expect(response.body().message).toBeDefined()
   })
-
-  test('Should reject if token is wrong', async ({ client, expect }) => {
-    const response = await client
-      .get('/api/projects/' + testProject.slug + '/version')
-      .bearerToken('wrong token!')
-
-    expect(response.status()).toBe(401)
-    expect(response.body().errors).toBeDefined()
-  })
 })

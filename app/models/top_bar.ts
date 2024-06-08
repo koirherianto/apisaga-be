@@ -5,12 +5,12 @@ import SidebarItem from '#models/sidebar_item'
 import SidebarSeparator from '#models/sidebar_separator'
 import Version from './version.js'
 
-export default class TobBar extends BaseModel {
+export default class TopBar extends BaseModel {
   @column({ isPrimary: true })
-  declare id: number
+  declare id: string
 
   @column()
-  declare versionId: number
+  declare versionId: string
 
   @column()
   declare name: string
