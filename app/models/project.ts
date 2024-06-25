@@ -41,12 +41,26 @@ export default class Project extends BaseModel {
   declare updatedAt: DateTime
 
   @beforeCreate()
-  static assignUuid(project: Project) {
+  static async assignUuid(project: Project) {
     project.id = crypto.randomUUID()
+    // if (!project.slug) {
+    //   project.slug = string.slug(project.title, { lower: true })
+    // }
 
-    if (!project.slug) {
-      project.slug = string.slug(project.title, { lower: true })
+    const baseSlug = string.slug(project.title, { lower: true })
+    let slug = baseSlug
+    let count = 1
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const existingProject = await Project.query().where('slug', slug).first()
+      if (!existingProject || existingProject.id === project.id) {
+        break
+      }
+      slug = `${baseSlug}-${count}`
+      count++
     }
+    project.slug = slug
   }
 
   @belongsTo(() => License, {
