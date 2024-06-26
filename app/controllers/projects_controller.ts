@@ -38,13 +38,13 @@ export default class ProjectsController {
   }
 
   async store({ auth, request, response }: HttpContext) {
+    // return data
     const data = await request.validateUsing(createProjectValidator)
-
     const trx = await db.transaction()
-
     try {
-      // Create project within the transaction
-      const project = await auth.user!.related('projects').create(data, { trx })
+      const user = auth.user!
+      const project = await Project.create(data, { client: trx })
+      user.related('projects').save(project)
 
       // Create version within the transaction
       const version = await Version.create(
@@ -62,16 +62,18 @@ export default class ProjectsController {
         {
           versionId: version.id,
           name: 'Main',
+          isDefault: true,
         },
         { client: trx }
       )
 
-      // Create SidebarItem within the transaction
+      // // Create SidebarItem within the transaction
       await SidebarItem.create(
         {
           topBarId: topBar.id,
           name: 'Introduction',
           order: 1,
+          isDefault: true,
           content: '# Introduction\n\nThis is the introduction of your project',
         },
         { client: trx }
@@ -145,6 +147,35 @@ export default class ProjectsController {
       success: true,
       data: project,
       message: 'Project deleted successfully',
+    })
+  }
+
+  async projectDefaultVersion({ auth, response, params }: HttpContext) {
+    const slug = await projectSlugValidator.validate(params.slug)
+    // return auth.user!.related('projects').query()
+    const project = await auth.user!.related('projects').query().where('slug', slug).first()
+    // return project
+    const version = await project?.related('versions').query().where('isDefault', true).first()
+    // return version
+    const topBar = await version?.related('topBars').query().where('isDefault', true).first()
+    // return topBar
+    const sidebarItem = await topBar
+      ?.related('sidebarItems')
+      .query()
+      .where('isDefault', true)
+      .first()
+
+    const defaultVersion = {
+      defaultProject: slug,
+      defaultVersion: version?.name,
+      defaultTopbar: topBar?.slug,
+      defaultLeftbar: sidebarItem?.slug,
+    }
+
+    return response.status(200).json({
+      success: true,
+      data: defaultVersion,
+      message: 'Default version fetched successfully',
     })
   }
 }

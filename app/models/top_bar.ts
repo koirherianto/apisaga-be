@@ -19,6 +19,9 @@ export default class TopBar extends BaseModel {
   @column()
   declare slug: string
 
+  @column()
+  declare isDefault: boolean
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
@@ -29,10 +32,10 @@ export default class TopBar extends BaseModel {
   declare version: BelongsTo<typeof Version>
 
   @hasMany(() => SidebarItem)
-  declare sidebarItem: HasMany<typeof SidebarItem>
+  declare sidebarItems: HasMany<typeof SidebarItem>
 
   @hasMany(() => SidebarSeparator)
-  declare sidebarSeparator: HasMany<typeof SidebarSeparator>
+  declare sidebarSeparators: HasMany<typeof SidebarSeparator>
 
   @beforeCreate()
   static async assignUuid(topbar: TopBar) {

@@ -31,6 +31,8 @@ router.group(() => {
     router.post('/projects', [ProjectsController, 'store'])
     router.put('/projects/:slug', [ProjectsController, 'update'])
     router.delete('/projects/:slug', [ProjectsController, 'destroy'])
+    // default version
+    router.get('/projectDefaultVersion/:slug', [ProjectsController, 'projectDefaultVersion'])
 
     // Version Routes
     

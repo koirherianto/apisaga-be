@@ -25,6 +25,9 @@ export default class SidebarItem extends BaseModel {
   declare order: number
 
   @column()
+  declare isDefault: boolean
+
+  @column()
   declare content: string | null
 
   @column.dateTime({ autoCreate: true })
