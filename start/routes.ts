@@ -6,6 +6,7 @@ const ProjectsController = () => import('#controllers/projects_controller')
 const VersionsController = () => import('#controllers/versions_controller')
 const SidebarSeparator = () => import('#controllers/sidebar_separators_controller')
 const SidebarItem = () => import('#controllers/sidebar_items_controller')
+const TopBarsController = () => import('#controllers/top_bars_controller')
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
 
@@ -35,11 +36,13 @@ router.group(() => {
     router.get('/projectDefaultVersion/:slug', [ProjectsController, 'projectDefaultVersion'])
 
     // Version Routes
-    
     router.get('/projects/:slug/version/:version', [VersionsController, 'show'])
     router.post('/projects/:slug/version', [VersionsController, 'store'])
     router.put('/projects/:slug/version/:version', [VersionsController, 'update'])
     router.delete('/projects/:slug/version/:version', [VersionsController, 'destroy'])
+
+    // Top Bar Routes
+    router.get('/projects/:projectSlug/version/:version/top-bar/:topBarSlug/getLeftbar', [TopBarsController, 'getLeftbar'])
 
     // Sidebar Separator Routes
     router.get('/projects/:projectSlug/version/:version/sidebar-separator', [SidebarSeparator, 'index'])
